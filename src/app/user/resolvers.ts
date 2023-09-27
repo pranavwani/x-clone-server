@@ -62,6 +62,11 @@ const queries = {
         if (!id) return null;
 
         return prismaClient.user.findUnique({ where: { id }});
+    },
+    getUserByID: async (parent: any, { id }: { id: string })=> {
+        if (!id) return null
+
+        return prismaClient.user.findUnique({ where: { id }})
     }
 }
 
