@@ -2,25 +2,18 @@ import {Post} from "@prisma/client";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import {GraphqlContext} from "../../interfaces";
-import { prismaClient } from "../../clients/db";
-
-interface CreatePostData {
-    content: string
-    imageURL?: string
-}
+import PostService, {CreatePostData} from "../../services/post";
+import UserService from "../../services/user";
 
 const UNAUTHENTICATED = "Unauthenticated"
 
 const s3Client = new S3Client({
-    region: process.env.AWS_S3_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_S3_ACCESS_KEY as string,
-        secretAccessKey: process.env.AWS_S3_SECRET_KEY as string
-    }
+    region: process.env.AWS_S3_REGION
 })
 
 const queries = {
-    getAllPosts: () => prismaClient.post.findMany({ orderBy: { createdAt: "desc" } }),
+    getAllPosts: () => PostService.getAllPosts(),
+
     getSignedURLForPost: async (parent: any, { imageName, imageType }: { imageName: string, imageType: string }, ctx: GraphqlContext) => {
         if (!ctx.user || !ctx.user.id) throw new Error(UNAUTHENTICATED);
 
@@ -41,19 +34,17 @@ const mutations= {
     createPost: async (parent: any, { payload }: { payload: CreatePostData }, ctx: GraphqlContext)=> {
 
         if (!ctx.user || !ctx.user.id) throw new Error(UNAUTHENTICATED);
-        return prismaClient.post.create({
-            data: {
-                content: payload.content,
-                imageURL: payload.imageURL,
-                author: { connect: { id: ctx.user.id } }
-            }
-        });
+
+        return PostService.createPost({
+            ...payload,
+            userID: ctx.user.id
+        })
     }
 }
 
 const extraResolvers = {
     Post: {
-        author: (parent: Post) => prismaClient.user.findUnique({ where: { id: parent.authorID } })
+        author: (parent: Post) => UserService.getUserByID(parent.authorID)
     }
 }
 
