@@ -6,5 +6,6 @@ export const types = `#graphql
         email: String!
         profileImageUrl: String
         posts: [Post]
+        createdAt: String
     }
 `
