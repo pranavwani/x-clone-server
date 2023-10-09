@@ -54,6 +54,6 @@ export default class UserService {
     }
 
     public static async getUserByID(id: string) {
-        return prismaClient.user.findUnique({ where: {id }})
+        return prismaClient.user.findUnique({ where: { id } })
     }
 }

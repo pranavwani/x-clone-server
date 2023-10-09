@@ -22,6 +22,6 @@ export default class PostService {
     }
 
     public static async getPostsByAuthorID(authorID: string) {
-        return prismaClient.post.findMany({ where: { authorID }})
+        return prismaClient.post.findMany({ where: { authorID }, orderBy: { createdAt: "desc" }})
     }
 }
