@@ -5,7 +5,10 @@ export const types = `#graphql
         lastName: String
         email: String!
         profileImageUrl: String
+        
         posts: [Post]
+        followers: [User]
+        following: [User]
         createdAt: String
     }
 `

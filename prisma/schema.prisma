@@ -11,23 +11,36 @@ datasource db {
 }
 
 model User {
-  id String @id @default(cuid())
-  firstName String
-  lastName String?
-  email String @unique
+  id              String   @id @default(cuid())
+  firstName       String
+  lastName        String?
+  email           String   @unique
   profileImageUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   posts Post[]
+
+  follower  Follows[] @relation("follower")
+  following Follows[] @relation("following")
+}
+
+model Follows {
+  follower   User   @relation("follower", fields: [followerID], references: [id])
+  followerID String
+
+  following   User   @relation("following", fields: [followingID], references: [id])
+  followingID String
+
+  @@id([followerID, followingID])
 }
 
 model Post {
-  id String @id @default(cuid())
-  content String
+  id       String  @id @default(cuid())
+  content  String
   imageURL String?
 
-  author User @relation(fields: [authorID], references: [id])
+  author   User   @relation(fields: [authorID], references: [id])
   authorID String
 
   createdAt DateTime @default(now())

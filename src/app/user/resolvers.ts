@@ -2,6 +2,7 @@ import {User} from "@prisma/client";
 import {GraphqlContext} from "../../interfaces";
 import UserService from "../../services/user";
 import PostService from "../../services/post";
+import {prismaClient} from "../../clients/db";
 
 const queries = {
     verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
@@ -22,10 +23,33 @@ const queries = {
     }
 }
 
-const extraResolvers = {
-    User: {
-        posts: (parent: User) => PostService.getPostsByAuthorID(parent.id)
+const mutations = {
+    followUser: async (parent: any, {followingID}: { followingID: string }, ctx: GraphqlContext) => {
+        if (!ctx.user?.id) throw new Error("Unauthenticated")
+        await UserService.followUser(ctx.user.id, followingID)
+        return true
+    },
+    unfollowUser: async (parent: any, {followingID}: { followingID: string }, ctx: GraphqlContext) => {
+        if (!ctx.user?.id) throw new Error("Unauthenticated")
+        await UserService.unfollowUser(ctx.user.id, followingID)
+        return true
     }
 }
 
-export const resolvers = { queries, extraResolvers }
+const extraResolvers = {
+    User: {
+        posts: (parent: User) => PostService.getPostsByAuthorID(parent.id),
+        followers: async (parent: User) => {
+            const result = await UserService.followers(parent.id)
+
+            return result.map(record => record.follower)
+        },
+        following: async (parent: User) => {
+            const result = await UserService.following(parent.id)
+
+            return result.map(record => record.following)
+        }
+    }
+}
+
+export const resolvers = { queries, extraResolvers, mutations }

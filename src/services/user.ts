@@ -56,4 +56,47 @@ export default class UserService {
     public static async getUserByID(id: string) {
         return prismaClient.user.findUnique({ where: { id } })
     }
+
+    public static async followUser(followerID: string, followingID: string) {
+        return prismaClient.follows.create({
+            data: {
+                follower: { connect: { id: followerID } },
+                following: { connect: { id: followingID } }
+            }
+        })
+    }
+
+    public static async unfollowUser(followerID: string, followingID: string) {
+        return prismaClient.follows.delete({
+            where: {
+                followerID_followingID: { followerID, followingID }
+            }
+        })
+    }
+
+    public static async followers(followingID: string) {
+        return prismaClient.follows.findMany({
+            where: {
+                following: {
+                    id: followingID
+                }
+            },
+            select: {
+                follower: true
+            }
+        })
+    }
+
+    public static async following(followerID: string) {
+        return prismaClient.follows.findMany({
+            where: {
+                follower: {
+                    id: followerID
+                }
+            },
+            select: {
+                following: true
+            }
+        })
+    }
 }
