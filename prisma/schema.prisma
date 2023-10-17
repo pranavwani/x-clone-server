@@ -21,7 +21,7 @@ model User {
 
   posts Post[]
 
-  follower  Follows[] @relation("follower")
+  followers  Follows[] @relation("follower")
   following Follows[] @relation("following")
 }
 

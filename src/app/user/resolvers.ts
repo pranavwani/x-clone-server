@@ -2,12 +2,13 @@ import {User} from "@prisma/client";
 import {GraphqlContext} from "../../interfaces";
 import UserService from "../../services/user";
 import PostService from "../../services/post";
+import {prismaClient} from "../../clients/db";
 
 const queries = {
-    verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
+    verifyGoogleToken: async (parent: any, {token}: { token: string }) => {
         return UserService.verifyGoogleAuthToken(token)
     },
-    getCurrentUser: async (parent: any, args: any, ctx: GraphqlContext)=> {
+    getCurrentUser: async (parent: any, args: any, ctx: GraphqlContext) => {
 
         const id = ctx.user?.id
 
@@ -15,7 +16,7 @@ const queries = {
 
         return UserService.getUserByID(id);
     },
-    getUserByID: async (parent: any, { id }: { id: string })=> {
+    getUserByID: async (parent: any, {id}: { id: string }) => {
         if (!id) return null
 
         return UserService.getUserByID(id)
@@ -47,8 +48,13 @@ const extraResolvers = {
             const result = await UserService.following(parent.id)
 
             return result.map(record => record.following)
+        },
+        recommendedUsers: async (parent: any, args: any, ctx: GraphqlContext) => {
+            if (!ctx.user?.id) return null
+
+            return UserService.recommendedUsers(ctx.user.id)
         }
     }
 }
 
-export const resolvers = { queries, extraResolvers, mutations }
+export const resolvers = {queries, extraResolvers, mutations}

@@ -1,6 +1,7 @@
 import axios from "axios";
 import {prismaClient} from "../clients/db";
 import JWTService from "./jwt";
+import {User} from "@prisma/client";
 
 interface GoogleTokenResult {
     iss?: string,
@@ -98,5 +99,43 @@ export default class UserService {
                 following: true
             }
         })
+    }
+
+    public static async recommendedUsers(currentUser: string) {
+        const myFollowing = await prismaClient.follows.findMany({
+            where: {
+                follower: {
+                    id: currentUser
+                }
+            },
+            include: {
+                following: {
+                    include: {
+                        followers: {
+                            include: {
+                                following: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        const recommendedUsers: User[] = []
+
+        for (const following of myFollowing) {
+            if (following.following.followers.length > 0) {
+                for (const followingFollowing of following.following.followers) {
+                    if (
+                        !myFollowing.some(following => following.followingID === followingFollowing.followingID)
+                        && followingFollowing.followingID !== currentUser
+                    ) {
+                        recommendedUsers.push(followingFollowing.following)
+                    }
+                }
+            }
+        }
+
+        return recommendedUsers
     }
 }
