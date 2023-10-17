@@ -2,7 +2,6 @@ import {User} from "@prisma/client";
 import {GraphqlContext} from "../../interfaces";
 import UserService from "../../services/user";
 import PostService from "../../services/post";
-import {prismaClient} from "../../clients/db";
 
 const queries = {
     verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
