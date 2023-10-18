@@ -111,7 +111,7 @@ export default class UserService {
             include: {
                 following: {
                     include: {
-                        followers: {
+                        following: {
                             include: {
                                 following: true
                             }
@@ -124,8 +124,8 @@ export default class UserService {
         const recommendedUsers: User[] = []
 
         for (const following of myFollowing) {
-            if (following.following.followers.length > 0) {
-                for (const followingFollowing of following.following.followers) {
+            if (following.following.following.length > 0) {
+                for (const followingFollowing of following.following.following) {
                     if (
                         !myFollowing.some(following => following.followingID === followingFollowing.followingID)
                         && followingFollowing.followingID !== currentUser
