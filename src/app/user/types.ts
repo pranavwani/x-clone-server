@@ -12,4 +12,9 @@ export const types = `#graphql
         recommendedUsers: [User]
         createdAt: String
     }
+    
+    type Relations {
+        followers: [User]
+        following: [User]
+    }
 `

@@ -20,6 +20,19 @@ const queries = {
         if (!id) return null
 
         return UserService.getUserByID(id)
+    },
+    getUserRelations: async (parent: any, {id}: { id: string }, ctx: GraphqlContext) => {
+        if (!id && !ctx.user?.id) return null
+
+        const relations = await UserService.relations(id)
+
+        const following = relations?.following.map(record => record.following)
+        const followers = relations?.followers.map(record => record.follower)
+
+        return {
+            followers,
+            following
+        }
     }
 }
 

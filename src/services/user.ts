@@ -138,4 +138,24 @@ export default class UserService {
 
         return recommendedUsers
     }
+
+    public static async relations(id: string) {
+        return prismaClient.user.findUnique({
+            where: {
+                id
+            },
+            select: {
+                following: {
+                    select: {
+                        following: true
+                    }
+                },
+                followers: {
+                    select: {
+                        follower: true
+                    }
+                }
+            }
+        })
+    }
 }
