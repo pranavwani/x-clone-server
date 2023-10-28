@@ -67,6 +67,9 @@ export default class PostService {
                     }
                 }
             },
+            orderBy: {
+                createdAt: "desc"
+            },
             select: {
                 id: true,
                 content: true,
