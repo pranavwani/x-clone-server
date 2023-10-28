@@ -37,8 +37,6 @@ const queries = {
     },
 
     getPostsWithReplies: async (parent: any, {authorID}: {authorID: string}, ctx: GraphqlContext) => {
-        if (!ctx.user || !ctx.user.id) throw new Error(UNAUTHENTICATED)
-
         return PostService.getPostsWithReplies(authorID)
     }
 }
