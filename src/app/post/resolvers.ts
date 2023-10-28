@@ -4,6 +4,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import {GraphqlContext} from "../../interfaces";
 import PostService, {CreatePostData} from "../../services/post";
 import UserService from "../../services/user";
+import {prismaClient} from "../../clients/db";
 
 const UNAUTHENTICATED = "Unauthenticated"
 
@@ -27,6 +28,18 @@ const queries = {
         })
 
         return getSignedUrl(s3Client, putObjectCommand)
+    },
+
+    getPostByID: async (parent: any, {id}: {id: string}, ctx: GraphqlContext) => {
+        if (!ctx.user || !ctx.user.id) throw new Error(UNAUTHENTICATED)
+
+        return PostService.getPostByID(id);
+    },
+
+    getPostsWithReplies: async (parent: any, {authorID}: {authorID: string}, ctx: GraphqlContext) => {
+        if (!ctx.user || !ctx.user.id) throw new Error(UNAUTHENTICATED)
+
+        return PostService.getPostsWithReplies(authorID)
     }
 }
 

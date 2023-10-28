@@ -2,6 +2,7 @@ export const types = `#graphql
     input CreatePostData {
         content: String!
         imageURL: String
+        parentPostID: ID
     }
     
     type Post {
@@ -9,5 +10,7 @@ export const types = `#graphql
         content: String!
         imageURL: String
         author: User
+        parentPostID: ID
+        replies: [Post]
     }
 `

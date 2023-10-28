@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User model to represents users
 model User {
   id              String   @id @default(cuid())
   firstName       String
@@ -21,10 +22,11 @@ model User {
 
   posts Post[]
 
-  followers  Follows[] @relation("following")
+  followers Follows[] @relation("following")
   following Follows[] @relation("follower")
 }
 
+// Follows model to represent followers of the users
 model Follows {
   follower   User   @relation("follower", fields: [followerID], references: [id])
   followerID String
@@ -35,6 +37,7 @@ model Follows {
   @@id([followerID, followingID])
 }
 
+// Post model to represent Posts
 model Post {
   id       String  @id @default(cuid())
   content  String
@@ -45,4 +48,8 @@ model Post {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  replies      Post[]  @relation("RepliesTo")
+  parentPost   Post?   @relation("RepliesTo", fields: [parentPostID], references: [id])
+  parentPostID String?
 }
